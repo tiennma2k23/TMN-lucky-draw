@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Prize {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  imageUrl    String?
+  quantity    Int          @default(1)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  rounds      RoundPrize[]
+  winners     Winner[]
+}
+
+model DrawRound {
+  id           String        @id @default(cuid())
+  name         String
+  description  String?
+  date         DateTime      @default(now())
+  isActive     Boolean       @default(false)
+  isCompleted  Boolean       @default(false)
+  order        Int          @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  participants Participant[]
+  prizes       RoundPrize[]
+  winners      Winner[]
+}
+
+model RoundPrize {
+  id        String    @id @default(cuid())
+  roundId   String
+  prizeId   String
+  quantity  Int       @default(1)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  prize     Prize     @relation(fields: [prizeId], references: [id])
+  round     DrawRound @relation(fields: [roundId], references: [id])
+
+  @@unique([roundId, prizeId])
+}
+
+model Participant {
+  id        String    @id @default(cuid())
+  code      String
+  name      String
+  phone     String
+  roundId   String
+  round     DrawRound @relation(fields: [roundId], references: [id])
+  winners   Winner[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([roundId])
+  @@unique([roundId, code])
+}
+
+model Winner {
+  id            String      @id @default(cuid())
+  roundId       String
+  round         DrawRound   @relation(fields: [roundId], references: [id])
+  prizeId       String
+  prize         Prize       @relation(fields: [prizeId], references: [id])
+  participantId String
+  participant   Participant @relation(fields: [participantId], references: [id])
+  drawnAt       DateTime    @default(now())
+
+  @@index([roundId])
+  @@index([prizeId])
+  @@index([participantId])
+}
+
+model Settings {
+  id              String   @id @default("1")
+  currentRoundId  String?
+  backgroundImage String?  @default("/images/default-background.jpg")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
