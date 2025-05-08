@@ -1,8 +1,8 @@
 Run:
-  npm install --legacy-peer-deps
-  npx prisma migrate deploy
-  npx prisma migrate reset --force
-  npx prisma db seed
-  mkdir -p public/images/prizes
-  chmod -R 755 public/images
+  npm install --legacy-peer-deps \n
+  npx prisma migrate deploy \n
+  npx prisma migrate reset --force \n
+  npx prisma db seed \n
+  mkdir -p public/images/prizes \n
+  chmod -R 755 public/images \n
   npm run dev
